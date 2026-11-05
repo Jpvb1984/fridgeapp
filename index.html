@@ -31,17 +31,33 @@
     </form>
     <p id="qa-hint" class="hint" aria-live="polite"></p>
 
-    <div class="seg" role="tablist" aria-label="Location">
-      <button type="button" class="seg-btn active" data-loc="todo">All</button>
-      <button type="button" class="seg-btn" data-loc="nevera">Fridge</button>
-      <button type="button" class="seg-btn" data-loc="congelador">Freezer</button>
-      <button type="button" class="seg-btn" data-loc="despensa">Pantry</button>
+    <div class="appliances" role="tablist" aria-label="Where to look">
+      <div class="fridge">
+        <button type="button" class="door freezer" data-loc="congelador" role="tab">
+          <span class="door-label">Freezer</span><span class="door-count" data-count="congelador"></span>
+          <span class="handle" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="door main" data-loc="nevera" role="tab">
+          <span class="door-label">Fridge</span><span class="door-count" data-count="nevera"></span>
+          <span class="handle" aria-hidden="true"></span>
+          <span id="note" class="note" hidden></span>
+        </button>
+        <span class="feet" aria-hidden="true"></span>
+      </div>
+      <button type="button" class="door pantry" data-loc="despensa" role="tab">
+        <span class="door-label">Pantry</span><span class="door-count" data-count="despensa"></span>
+        <span class="knob" aria-hidden="true"></span>
+        <span class="split" aria-hidden="true"></span>
+      </button>
     </div>
+    <button type="button" class="door-all" data-loc="todo">Show everything <span data-count="todo"></span></button>
 
+    <div id="interior" class="interior">
     <ul id="inv-list" class="list"></ul>
     <div id="inv-empty" class="empty" hidden>
       <p class="empty-title">Your fridge is empty</p>
       <p>Type what you have above, for example “milk” or “2 kg potatoes”, and tap Add.</p>
+    </div>
     </div>
   </section>
 

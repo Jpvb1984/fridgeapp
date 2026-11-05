@@ -133,7 +133,7 @@
   }
 
   // ---------- Vistas ----------
-  let currentView = 'inventario', currentLoc = 'todo';
+  let currentView = 'inventario', currentLoc = 'nevera';
 
   function sortByExpiry(a, b) {
     const da = daysUntil(a.expiresAt), dbb = daysUntil(b.expiresAt);
@@ -148,7 +148,7 @@
     if (it.price != null) meta.push(fmtMoney.format(it.price));
     const exp = `<span class="exp ${cls}">${expLabel(n)}${it.expiryEstimated && n !== null ? '<span class="est" title="Estimated date"> ≈</span>' : ''}</span>`;
     return `<li class="item" data-id="${it.id}">
-      <span class="dot ${cls}" aria-hidden="true"></span>
+      <span class="ava ${cls}" aria-hidden="true">${CATEGORIES[it.category]?.icon || '🛒'}</span>
       <div class="main">
         <div class="name">${esc(it.name)}</div>
         <div class="meta">${withQty ? exp + ' · ' : ''}${esc(meta.join(' · '))}</div>
@@ -159,21 +159,43 @@
 
   function renderInventory() {
     const counts = { todo: db.items.length, nevera: 0, congelador: 0, despensa: 0 };
-    db.items.forEach(i => counts[i.location]++);
-    $$('.seg-btn[data-loc]').forEach(b => {
-      b.classList.toggle('active', b.dataset.loc === currentLoc);
-      b.innerHTML = `${LOC_LABEL[b.dataset.loc] || 'All'}${counts[b.dataset.loc] ? `<span class="n">${counts[b.dataset.loc]}</span>` : ''}`;
+    const soonBy = { todo: 0, nevera: 0, congelador: 0, despensa: 0 };
+    db.items.forEach(i => {
+      counts[i.location]++;
+      const d = daysUntil(i.expiresAt);
+      if (d !== null && d <= SOON_DAYS) { soonBy[i.location]++; soonBy.todo++; }
     });
+    $$('[data-loc]').forEach(b => {
+      const on = b.dataset.loc === currentLoc;
+      b.classList.toggle('active', on); b.setAttribute('aria-selected', on);
+    });
+    $$('[data-count]').forEach(el => {
+      const k = el.dataset.count, n = counts[k];
+      el.innerHTML = k === 'todo' ? (n ? `(${n})` : '')
+        : `${n ? `${n} item${n === 1 ? '' : 's'}` : 'Empty'}${soonBy[k] ? ` · <b>${soonBy[k]} soon</b>` : ''}`;
+    });
+    // Sticky note on the fridge door: what to use first
+    const urgent = [...db.items].filter(i => { const d = daysUntil(i.expiresAt); return d !== null && d <= SOON_DAYS; }).sort(sortByExpiry);
+    const note = $('#note');
+    note.hidden = urgent.length === 0;
+    note.innerHTML = `<b>Use first</b>${urgent.slice(0, 3).map(i => `<span>${esc(i.name)}</span>`).join('')}${urgent.length > 3 ? `<span class="more">+${urgent.length - 3} more · tap</span>` : ''}`;
+
+    $('#interior').dataset.where = currentLoc;
     const items = db.items.filter(i => currentLoc === 'todo' || i.location === currentLoc).sort(sortByExpiry);
-    $('#inv-list').innerHTML = items.map(i => itemRow(i)).join('');
+    // One shelf per category, shelves ordered by their most urgent item
+    const shelves = new Map();
+    for (const it of items) { if (!shelves.has(it.category)) shelves.set(it.category, []); shelves.get(it.category).push(it); }
+    $('#inv-list').innerHTML = [...shelves.entries()].map(([cat, list]) => `
+      <li class="shelf">
+        <div class="shelf-h"><span>${CATEGORIES[cat].icon}</span> ${esc(CATEGORIES[cat].label)} <em>${list.length}</em></div>
+        <ul class="shelf-items">${list.map(i => itemRow(i)).join('')}</ul>
+      </li>`).join('');
     const none = db.items.length === 0;
-    $('#inv-empty').hidden = !none;
+    $('#inv-empty').hidden = items.length > 0;
     if (!none && items.length === 0) {
-      $('#inv-list').innerHTML = '';
-      $('#inv-empty').hidden = false;
-      $('#inv-empty').innerHTML = `<p class="empty-title">Nothing in the ${esc(LOC_LABEL[currentLoc].toLowerCase())}</p><p>Items you store here will show up in this list.</p>`;
+      $('#inv-empty').innerHTML = `<p class="empty-title">The ${esc(LOC_LABEL[currentLoc].toLowerCase())} is empty</p><p>Items you store here will show up on these shelves.</p>`;
     } else if (none) {
-      $('#inv-empty').innerHTML = `<p class="empty-title">Your fridge is empty</p><p>Type what you have above, for example “milk” or “2 kg potatoes”, and tap Add. The app estimates where it goes and when it expires; you can adjust both later.</p>`;
+      $('#inv-empty').innerHTML = `<p class="empty-title">Your fridge is empty</p><p>Type what you have above, for example “milk” or “2 kg potatoes”, and tap Add. Or use Scan to read a receipt.</p>`;
     }
     $('#known-names').innerHTML = Object.values(db.learned).map(l => `<option value="${esc(l.name)}">`).join('');
   }
@@ -309,7 +331,10 @@
     const p = parseQuick(v), d = defaultsFor(p.name || v);
     $('#qa-hint').textContent = `${p.qty ?? 1} ${UL(p.unit || d.unit)} · ${CATEGORIES[d.category].label} · ${LOC_LABEL[d.location]} · expires in about ${d.days} days`;
   });
-  $$('.seg-btn[data-loc]').forEach(b => b.addEventListener('click', () => { currentLoc = b.dataset.loc; renderInventory(); }));
+  $$('[data-loc]').forEach(b => b.addEventListener('click', e => {
+    if (e.target.closest('#note')) { showView('caduca'); return; }
+    currentLoc = b.dataset.loc; renderInventory();
+  }));
   $$('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
   document.addEventListener('click', e => {
     const step = e.target.closest('[data-step]');
