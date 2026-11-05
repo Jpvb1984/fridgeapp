@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f6b4f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16201b" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FridgeApp">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+<title>FridgeApp</title>
+</head>
+<body>
+<header class="top">
+  <h1 id="title">Inventory</h1>
+  <button type="button" id="currency" class="chip" aria-label="Currency (tap to switch)">CAD</button>
+</header>
+
+<main>
+  <!-- INVENTARIO -->
+  <section id="view-inventario" class="view" data-title="Inventory">
+    <form id="quick-add" class="quick-add" autocomplete="off">
+      <input id="qa-name" name="name" type="text" placeholder="Add an item…" aria-label="Item name" list="known-names" enterkeyhint="done" required>
+      <datalist id="known-names"></datalist>
+      <button type="submit" class="btn primary" aria-label="Add">Add</button>
+    </form>
+    <p id="qa-hint" class="hint" aria-live="polite"></p>
+
+    <div class="seg" role="tablist" aria-label="Location">
+      <button type="button" class="seg-btn active" data-loc="todo">All</button>
+      <button type="button" class="seg-btn" data-loc="nevera">Fridge</button>
+      <button type="button" class="seg-btn" data-loc="congelador">Freezer</button>
+      <button type="button" class="seg-btn" data-loc="despensa">Pantry</button>
+    </div>
+
+    <ul id="inv-list" class="list"></ul>
+    <div id="inv-empty" class="empty" hidden>
+      <p class="empty-title">Your fridge is empty</p>
+      <p>Type what you have above, for example “milk” or “2 kg potatoes”, and tap Add.</p>
+    </div>
+  </section>
+
+  <!-- CADUCIDADES -->
+  <section id="view-caduca" class="view" data-title="Expiring" hidden>
+    <div id="exp-groups"></div>
+    <div id="exp-empty" class="empty" hidden>
+      <p class="empty-title">Nothing about to expire</p>
+      <p>Once you add items, the ones to use first will show up here.</p>
+    </div>
+  </section>
+  <!-- SCAN -->
+  <section id="view-scan" class="view" data-title="Scan" hidden>
+    <div class="seg" role="tablist" aria-label="What are you scanning">
+      <button type="button" class="seg-btn scan-mode active" data-mode="receipt">Receipt</button>
+      <button type="button" class="seg-btn scan-mode" data-mode="fridge">Fridge or shelf</button>
+    </div>
+    <p id="scan-explain" class="hint"></p>
+
+    <div id="scan-start" class="scan-start">
+      <label class="btn primary big">
+        <input id="scan-camera" type="file" accept="image/*" capture="environment" hidden>
+        Take photo
+      </label>
+      <label class="btn big">
+        <input id="scan-library" type="file" accept="image/*" hidden>
+        Choose from photos
+      </label>
+    </div>
+
+    <div id="scan-busy" class="scan-busy" hidden>
+      <img id="scan-preview" alt="Photo being read">
+      <p><span class="spinner" aria-hidden="true"></span> <span id="scan-busy-text">Reading…</span></p>
+    </div>
+
+    <div id="scan-error" class="banner" hidden></div>
+
+    <form id="scan-review" hidden>
+      <div id="scan-summary" class="scan-summary"></div>
+      <ul id="scan-lines" class="list review"></ul>
+      <div class="review-actions">
+        <button type="submit" class="btn primary" id="scan-add">Add to inventory</button>
+        <button type="button" class="btn ghost" id="scan-discard">Discard</button>
+      </div>
+    </form>
+
+    <details id="scan-settings" class="settings">
+      <summary>Recognition settings</summary>
+      <p class="hint">Photos are read by Claude, Anthropic's AI, using your own API key. The key and your photos go only from this phone to Anthropic; nothing is stored anywhere else. Each photo costs a few cents. Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.</p>
+      <label class="field">API key
+        <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
+      </label>
+      <div class="row-btns">
+        <button type="button" class="btn" id="api-key-save">Save key</button>
+        <button type="button" class="btn ghost danger" id="api-key-clear">Remove</button>
+      </div>
+    </details>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Sections">
+  <button type="button" class="tab active" data-view="inventario">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M6 9.5h12M15 5.5v2M15 12.5v3"/></svg>
+    <span>Inventory</span>
+  </button>
+  <button type="button" class="tab" data-view="caduca">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>
+    <span>Expiring</span>
+    <b id="exp-badge" class="badge" hidden></b>
+  </button>
+  <button type="button" class="tab" data-view="scan">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg>
+    <span>Scan</span>
+  </button>
+</nav>
+
+<!-- Hoja de detalle -->
+<dialog id="sheet" class="sheet">
+  <form id="item-form" method="dialog">
+    <div class="sheet-head">
+      <button type="button" class="link" id="sheet-cancel">Cancel</button>
+      <strong id="sheet-title">Item</strong>
+      <button type="submit" class="link strong" id="sheet-save" value="save">Save</button>
+    </div>
+    <div class="fields">
+      <label>Name<input name="name" type="text" required></label>
+      <div class="row2">
+        <label>Quantity<input name="qty" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]+)?" required></label>
+        <label>Unit
+          <select name="unit">
+            <option value="ud">pcs</option><option value="kg">kg</option><option value="g">g</option>
+            <option value="l">l</option><option value="ml">ml</option><option value="paquete">pack</option>
+          </select>
+        </label>
+      </div>
+      <div class="row2">
+        <label>Location
+          <select name="location">
+            <option value="nevera">Fridge</option><option value="congelador">Freezer</option><option value="despensa">Pantry</option>
+          </select>
+        </label>
+        <label>Category<select name="category"></select></label>
+      </div>
+      <div class="row2">
+        <label>Expires on<input name="expiresAt" type="date"></label>
+        <label><span id="price-label">Price (CAD)</span><input name="price" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]{1,2})?" placeholder="0.00"></label>
+      </div>
+      <p id="est-note" class="hint"></p>
+      <div class="row2">
+        <label>Bought on<input name="boughtAt" type="date"></label>
+        <label>Minimum stock<input name="minStock" type="text" inputmode="decimal" pattern="[0-9]+([.,][0-9]+)?" placeholder="No minimum"></label>
+      </div>
+    </div>
+    <div id="sheet-actions" class="sheet-actions">
+      <button type="button" class="btn" data-act="consumed">Used it up</button>
+      <button type="button" class="btn warn" data-act="wasted">Threw it away</button>
+      <button type="button" class="btn ghost danger" data-act="delete">Delete without logging</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="foods.js"></script>
+<script src="app.js"></script>
+<script src="scan.js"></script>
+</body>
+</html>
