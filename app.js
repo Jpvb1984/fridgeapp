@@ -18,14 +18,19 @@
       const d = JSON.parse(raw);
       const out = Object.assign(emptyDb(), d);
       out.settings = Object.assign({ currency: 'CAD' }, d.settings || {});
+      out.aliases = out.aliases || {}; out.purchases = out.purchases || [];
       return out;
     } catch (e) { return emptyDb(); }
   }
   let db = load();
-  function save() {
+  function persist() {
     try { localStorage.setItem(KEY, JSON.stringify(db)); }
     catch (e) { toast('Could not save on this device'); }
   }
+  // Every local change goes through save(); the sync module listens for it.
+  function save() { persist(); document.dispatchEvent(new Event('fridge:saved')); }
+  // Changes that arrived from the other phone: store and redraw, without echoing them back.
+  function applyRemote(fn) { fn(db); persist(); setMoneyFormat(); render(); }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 
   // ---------- Fechas (en hora local) ----------
@@ -368,7 +373,7 @@
 
   // Para pruebas automáticas
   window.__fridge = {
-    parseQuick, defaultsFor, addItem, render, save, toast, showView, todayISO, addDays, nameKey, cap, esc, LOC_LABEL, UL,
+    parseQuick, defaultsFor, addItem, render, save, applyRemote, toast, showView, todayISO, addDays, nameKey, cap, esc, LOC_LABEL, UL,
     get db() { return db; }, get money() { return fmtMoney; },
   };
   document.dispatchEvent(new Event('fridge:ready'));

@@ -18,7 +18,10 @@
 <body>
 <header class="top">
   <h1 id="title">Inventory</h1>
-  <button type="button" id="currency" class="chip" aria-label="Currency (tap to switch)">CAD</button>
+  <div class="top-actions">
+    <button type="button" id="share-btn" class="chip" aria-label="Share with family">👪 <span id="share-state">Share</span></button>
+    <button type="button" id="currency" class="chip" aria-label="Currency (tap to switch)">CAD</button>
+  </div>
 </header>
 
 <main>
@@ -179,10 +182,41 @@
   </form>
 </dialog>
 
+<!-- Compartir -->
+<dialog id="share-sheet" class="sheet">
+  <div class="sheet-head">
+    <span></span>
+    <strong>Share with family</strong>
+    <button type="button" class="link strong" id="share-close">Done</button>
+  </div>
+  <div class="fields share-body">
+    <div id="share-off">
+      <p>Share one fridge between phones. Everything you add, use or throw away shows up on the other phone within seconds, even if one was offline for a while.</p>
+      <button type="button" class="btn primary wide" id="share-create">Create a shared household</button>
+      <p class="or">or join the one your partner created</p>
+      <label>Invite code<input id="share-code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. 7KQ2-…"></label>
+      <button type="button" class="btn wide" id="share-join">Join household</button>
+    </div>
+    <div id="share-on" hidden>
+      <p class="share-status"><span class="live-dot" aria-hidden="true"></span> <span id="share-live">Shared</span></p>
+      <label>Invite code for the other phone<input id="share-mycode" type="text" readonly></label>
+      <div class="row-btns">
+        <button type="button" class="btn primary" id="share-send">Send invite</button>
+        <button type="button" class="btn" id="share-copy">Copy code</button>
+      </div>
+      <p class="hint">On the other phone: open FridgeApp from its home-screen icon, tap 👪 Share, paste the code and tap Join. Their items are merged with yours.</p>
+      <button type="button" class="btn ghost danger wide" id="share-leave">Stop sharing on this phone</button>
+    </div>
+    <p id="share-msg" class="hint" aria-live="polite"></p>
+  </div>
+</dialog>
+
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="foods.js"></script>
 <script src="app.js"></script>
 <script src="scan.js"></script>
+<script src="firebase-config.js"></script>
+<script type="module" src="sync.js"></script>
 </body>
 </html>

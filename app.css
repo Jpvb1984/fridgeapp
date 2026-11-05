@@ -301,3 +301,15 @@ main { padding: 0 16px; max-width: 640px; margin: 0 auto; }
 .ava.ok { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--green) 55%, transparent); }
 
 @media (max-width: 360px) { .fridge { grid-template-rows: 80px 180px; } .door-label { font-size: 15px; } }
+
+/* Share */
+.top-actions { display: flex; gap: 6px; align-items: center; }
+.chip.on { color: var(--brand); border-color: color-mix(in srgb, var(--brand) 50%, var(--line)); }
+.share-body { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+.share-body p { margin: 4px 0 8px; font-size: 15px; }
+.btn.wide { width: 100%; margin-top: 4px; }
+.or { text-align: center; color: var(--muted); font-size: 13px !important; margin: 16px 0 6px !important; }
+.share-status { display: flex; align-items: center; gap: 8px; font-weight: 650; }
+.live-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px color-mix(in srgb, var(--green) 25%, transparent); }
+.live-dot.off { background: var(--amber); box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 25%, transparent); }
+#share-mycode { font-family: ui-monospace, Menlo, monospace; letter-spacing: .04em; }
