@@ -11,3 +11,4 @@
 - **Scan**: photos go straight from the phone to the Anthropic API with the user's key (no server). Model claude-opus-5-5 with a JSON schema answer and server-side fallback on refusals. Images downscaled to 1568 px. The user always reviews before saving; non-food lines are unticked; low-confidence items are flagged.
 - **Receipt total check**: lines + tax/fees must equal the printed total, otherwise the gap is shown.
 - **Learning**: corrected receipt line names are stored as aliases keyed by the printed text.
+- **Recipes**: built-in book (recipes-data.js) matched by keywords, so it works offline and free. Shown only when at most one required ingredient is missing. Processed foods (sauce, soup, paste) do not count as the fresh ingredient. Cookidoo link is a web search, since Cookidoo has no public API.

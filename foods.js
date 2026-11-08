@@ -48,6 +48,7 @@ window.FOOD = (function () {
 
   // English keywords (specific ones first)
   const KEYWORDS_EN = [
+    ['tortilla de patata', 'preparado'], ['tortillas', 'pan'], ['tortilla wrap', 'pan'], ['wraps', 'pan'], ['pita', 'pan'], ['naan', 'pan'],
     ['frozen', 'congelado'], ['ice cream', 'congelado'], ['eggplant', 'verdura'], ['peanut butter', 'salsas'], ['buttermilk', 'lacteos'],
     ['sauce', 'salsas'], ['mince', 'picada'], ['ground beef', 'picada'], ['burger', 'picada'],
     ['salad', 'hojas'], ['lettuce', 'hojas'], ['spinach', 'hojas'], ['rocket', 'hojas'], ['arugula', 'hojas'],

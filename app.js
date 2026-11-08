@@ -245,7 +245,7 @@
 
   function render() {
     renderBadge(); renderCurrency();
-    if (currentView === 'inventario') renderInventory(); else if (currentView === 'caduca') renderExpiry(); else document.dispatchEvent(new Event('fridge:render-scan'));
+    if (currentView === 'inventario') renderInventory(); else if (currentView === 'caduca') renderExpiry(); else document.dispatchEvent(new Event(`fridge:render-${currentView}`));
   }
 
   function showView(v) {
@@ -365,7 +365,7 @@
   // Arranque
   let startView = 'inventario';
   try { startView = sessionStorage.getItem('fridgeapp.view') || 'inventario'; } catch (e) {}
-  showView(['caduca', 'scan'].includes(startView) ? startView : 'inventario');
+  showView(['caduca', 'scan', 'recetas'].includes(startView) ? startView : 'inventario');
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});

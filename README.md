@@ -11,7 +11,8 @@ An installable web app (PWA) that tracks what is in your fridge, freezer and pan
 - **Expiring**: grouped into Expired, Today, Tomorrow, Within 3 days, This week and Later, with the money at stake.
 - **Currency**: CAD by default; tap the chip at the top right to switch to USD.
 - **Scan** (piece 3): photograph a receipt or a fridge shelf. Claude reads it and shows an editable list (name, quantity, unit, where it goes, price, days left) before anything is saved. Receipts are checked against their total including tax, saved for spending tracking, and a name you correct once is remembered for the next receipt. Needs your own Anthropic API key (Scan → Recognition settings).
-- Works offline (except Scan).
+- **Recipes**: 40 built-in home recipes ranked by what you can cook now, using food that expires soonest first. Every ingredient shows whether it is in the Fridge, Freezer or Pantry (or missing). "I cooked this" removes what you finished. Optional "More ideas with AI" invents 3 recipes from your exact inventory (uses the Scan API key).
+- Works offline (except Scan and AI ideas).
 
 ## Install on iPhone
 

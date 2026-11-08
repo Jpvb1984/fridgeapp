@@ -72,6 +72,20 @@
       <p>Once you add items, the ones to use first will show up here.</p>
     </div>
   </section>
+  <!-- RECETAS -->
+  <section id="view-recetas" class="view" data-title="Recipes" hidden>
+    <p class="hint rintro">Recipes you can make with what is in your fridge, freezer and pantry. Each ingredient shows where to find it.</p>
+    <div class="rfilters" role="tablist" aria-label="Filter recipes">
+      <button type="button" class="rfilter active" data-f="all">All</button>
+      <button type="button" class="rfilter" data-f="expiring">Uses expiring food</button>
+      <button type="button" class="rfilter" data-f="quick">20 min or less</button>
+    </div>
+    <p id="recipes-urgent" class="banner amber" hidden></p>
+    <div id="recipes-list"></div>
+    <button type="button" class="btn wide ai-btn" id="recipes-ai">✨ More ideas with AI</button>
+    <p class="hint center">AI ideas use your API key from Scan settings and cost about a cent.</p>
+  </section>
+
   <!-- SCAN -->
   <section id="view-scan" class="view" data-title="Scan" hidden>
     <div class="seg" role="tablist" aria-label="What are you scanning">
@@ -130,6 +144,10 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>
     <span>Expiring</span>
     <b id="exp-badge" class="badge" hidden></b>
+  </button>
+  <button type="button" class="tab" data-view="recetas">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11.5a4 4 0 0 1 .9-7.9A4.5 4.5 0 0 1 16.1 3.6 4 4 0 0 1 17 11.5V19a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19z"/><path d="M7 16h10"/></svg>
+    <span>Recipes</span>
   </button>
   <button type="button" class="tab" data-view="scan">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg>
@@ -216,6 +234,8 @@
 <script src="foods.js"></script>
 <script src="app.js"></script>
 <script src="scan.js"></script>
+<script src="recipes-data.js"></script>
+<script src="recipes.js"></script>
 <script src="firebase-config.js"></script>
 <script type="module" src="sync.js"></script>
 </body>
